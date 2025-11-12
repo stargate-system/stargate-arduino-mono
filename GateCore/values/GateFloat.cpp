@@ -3,10 +3,11 @@
 GateFloat::GateFloat(OutputBuffer* outputBuffer) : GateValue() {
     this->type = "float";
     this->outputBuffer = outputBuffer;
+    this->decimalPlaces = 2;
 }
 
 String GateFloat::toString() {
-    return String(this->value);
+    return String(this->value, this->decimalPlaces);
 }
 
 void GateFloat::fromRemote(String textValue) {

@@ -17,6 +17,7 @@ class GateFloat : public GateValue
         void setValue(double value, bool equalityCheck);
         void setMin(double min);
         void setMax(double max);
+        unsigned int decimalPlaces;
 
     private:
         double min;
