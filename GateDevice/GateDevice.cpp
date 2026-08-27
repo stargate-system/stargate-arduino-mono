@@ -29,6 +29,9 @@ GateDevice::GateDevice() : BaseDevice() {
     this->usePreviousAddress = false;
     this->lastServerAddress = "";
     this->lastServerPort = -1;
+    this->id = "";
+    this->password = "";
+    this->connectionKey = "";
 };
 
 void GateDevice::start() {
@@ -70,7 +73,28 @@ void GateDevice::loop() {
     }
 }
 
+void GateDevice::setRemote(String id, String password) {
+
+}
+
 void GateDevice::connectServer() {
+    if (this->id.length() > 0) {
+        this->connectRemoteServer();
+    } else {
+        this->connectLocalServer();
+    }
+}
+
+/*
+    connectionState:
+    0 - no connection
+    1 - discovery
+    2 - socket opening
+    3 - socket opened
+    4 - connection ready
+*/
+
+void GateDevice::connectLocalServer() {
     switch (this->connectionState) {
         case 0:
         {
@@ -118,6 +142,26 @@ void GateDevice::connectServer() {
             } else {
                 this->loopSocket();
             }
+            break;
+        }
+    }
+}
+
+void GateDevice::connectRemoteServer() {
+    switch (this->connectionState) {
+        case 0:
+        {
+            this->stopSocket();
+            if (this->usePreviousAddress && this->lastServerAddress.length() > 0 && this->lastServerPort != -1) {
+
+            } else {
+                this->connectionState = 1;
+            }
+            break;
+        }
+        case 1:
+        {
+            
             break;
         }
     }

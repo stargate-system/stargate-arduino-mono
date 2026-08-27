@@ -35,7 +35,7 @@ String GateSelect::toManifest() {
     if (this->nothingSelectedLabel.length() > 0) {
         manifest += ",\"nothingSelectedLabel\":\"" + this->nothingSelectedLabel + "\"}}";
     } else {
-        manifest += "}";
+        manifest += "}}";
     }
     return manifest;
 }

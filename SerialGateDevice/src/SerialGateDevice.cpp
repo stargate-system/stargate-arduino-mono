@@ -83,7 +83,7 @@ void SerialGateDevice::onMessage(String* remainingMessage) {
                     break;
                 case '?':
                     if (remainingMessage->charAt(2) == 'm') {
-                        handleManifestRequest(remainingMessage, this);
+                        handleManifestRequest(remainingMessage, this, "");
                     } else if (remainingMessage->charAt(2) == 't') {
                         handleTypeRequest(remainingMessage, this);
                     } else {

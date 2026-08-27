@@ -1,10 +1,9 @@
 #include "MessageHandler.h"
 
-void handleManifestRequest(String* message, BaseDevice* device) {
+void handleManifestRequest(String* message, BaseDevice* device, String id) {
     String* response = new String("*>manifest|");
     {
-//        String manifest = createManifest(device->deviceName, device->groupName, device->factory.getValues());
-        String manifest = createManifest(device);
+        String manifest = createManifest(device, id);
         response->concat(manifest.length());
         response->concat("|");
         response->concat(manifest);
@@ -20,41 +19,16 @@ void handleTypeRequest(String* message, BaseDevice* device) {
     message->remove(0, 8);
 }
 
-String createManifest(BaseDevice* device) {
+String createManifest(BaseDevice* device, String id) {
     String manifest("{");
-    #ifdef __AVR__
-        EEPROM.begin();
-    #else
-        EEPROM.begin(40);
-        delay(10);
-    #endif
-    if (EEPROM.read(0) == 0xFF) {
-        String id("");
-        byte currentByte;
-        int currentIndex = 1;
-        bool success = true;
-        while(true) {
-            currentByte = EEPROM.read(currentIndex);
-            if (currentByte == 0) {
-                break;
-            } else {
-                currentIndex++;
-                if (isAscii((char) currentByte)) {
-                    id += (char) currentByte;
-                } else {
-                    success = false;
-                    break;
-                }
-            }
-        }
-        if (success) {
-            manifest += "\"id\":\"" + id + "\",";
-        } else {
-            EEPROM.write(0, 0);
+    if (id.length() > 0) {
+        manifest += "\"id\":\"" + id + "\",";
+    } else {
+        String storedId = getIdFromEEPROM();
+        if (storedId.length() > 0) {
+            manifest += "\"id\":\"" + storedId + "\",";
         }
     }
-    EEPROM.end();
-
     manifest += "\"deviceName\":\"" + device->deviceName + "\"";
     if (device->groupName.length() > 0) {
         manifest += ",\"group\":\"" + device->groupName + "\"";
@@ -72,6 +46,47 @@ String createManifest(BaseDevice* device) {
     }
     manifest += "]}";
     return manifest;
+}
+
+String getIdFromEEPROM() {
+    #ifdef __AVR__
+        EEPROM.begin();
+    #else
+        EEPROM.begin(40);
+        delay(10);
+    #endif
+    String id("");
+    bool success = true;
+    if (EEPROM.read(0) == 0xFF) {
+        byte currentByte;
+        int currentIndex = 1;
+        while(true) {
+            currentByte = EEPROM.read(currentIndex);
+            if (currentByte == 0) {
+                break;
+            } else {
+                currentIndex++;
+                if (isAscii((char) currentByte)) {
+                    id += (char) currentByte;
+                } else {
+                    success = false;
+                    break;
+                }
+            }
+        }
+    } else {
+        EEPROM.end();
+        return "";
+    }
+    if (success) {
+        EEPROM.end();
+        return id;
+    } else {
+        EEPROM.write(0, 0);
+        EEPROM.end();
+        return "";
+    }
+    
 }
 
 void handleIdAssigned(String* message) {

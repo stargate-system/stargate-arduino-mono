@@ -38,6 +38,7 @@ class GateDevice : public BaseDevice
         int connectionState;
         String discoveryKeyword;
         int discoveryPort;
+        void setRemote(String id, String password);
 
     protected:
         virtual bool startUdp(int port) = 0;
@@ -58,6 +59,8 @@ class GateDevice : public BaseDevice
 
     private:
         void connectServer();
+        void connectLocalServer();
+        void connectRemoteServer();
         void handlePing();
         int pingInterval;
         unsigned long pingTimer;
@@ -66,6 +69,9 @@ class GateDevice : public BaseDevice
         int lastServerPort;
         bool handleHandshakeMessage(String* remainingMessage);
         bool handleReadyStateMessage(String* remainingMessage);
+        String id;
+        String password;
+        String connectionKey;
 };
 
 #endif
